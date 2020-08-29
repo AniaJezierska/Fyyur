@@ -333,7 +333,7 @@ def search_artists():
 
     data.append ({
       "id": artist.id,
-      "name": artist.name,
+      "name": artist.name,     
       "num_upcoming_shows": num_upcoming_shows
     })
   
