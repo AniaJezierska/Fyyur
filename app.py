@@ -160,14 +160,14 @@ def search_venues():
   # get the user search term
   search_term = request.form.get("search_term")
   # find all venues matching search term
-  results = Venue.query.filter(Venue.name.ilike('%' + search_term + '%')).all()
+  result = Venue.query.filter(Venue.name.ilike('%' + search_term + '%')).all()
 
   response = {
-    "count": len(results),
+    "count": len(result),
     "data": []
   }  
 
-  for venue in results:
+  for venue in result:
     num_upcoming_shows = 0
     shows_venue = Show.query.filter(Show.venue_id==venue.id).all()
     for show in shows_venue:
@@ -192,7 +192,7 @@ def show_venue(venue_id):
   #get a given venue
   venue = Venue.query.filter_by(id=venue_id).first()
 
-  shows_venue = db.session.query(Artist.name, Artist.image_link, Show.venue_id, Show.artist_id, Show.start_time).join(Show, Show.artist_id == Artist.id).filter(Show.venue_id == venue_id)
+  shows_venue = db.session.query(Artist.name, Artist.image_link, Show.venue_id, Show.artist_id, Show.start_time).join(Show, Show.artist_id == Artist.id).filter(Show.venue_id == venue_id).all()
   upcoming_shows = []
   past_shows = []
 
@@ -223,7 +223,7 @@ def show_venue(venue_id):
           "artist_name": show.artist.name,
           "artist_image_link": show.artist.image_link,
           "start_time": format_datetime(str(show.start_time))
-        })
+        })      
   
   #for past show add show details 
   for show in shows_venue:
@@ -233,10 +233,11 @@ def show_venue(venue_id):
           "artist_name": show.artist.name,
           "artist_image_link": show.artist.image_link,
           "start_time": format_datetime(str(show.start_time))
-        })    
+        })           
 
   return render_template('pages/show_venue.html', venue=data)
   # return template with venue data
+ 
 
 
 #  Create Venue
@@ -316,15 +317,15 @@ def search_artists():
   # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
   # search for "band" should return "The Wild Sax Band".   
   search_term = request.form.get('search_term') 
-  results = Artist.query.filter(Artist.name.ilike('%' + search_term + '%')).all()
+  result = Artist.query.filter(Artist.name.ilike('%' + search_term + '%')).all()
   data: []
 
   response = {
-    "count": len(results),
+    "count": len(result),
     "data": data
   } 
   
-  for artist in results:
+  for artist in result:
     num_upcoming_shows = 0
     shows_artist = Show.query.filter(Show.artist_id==artist.id).all()
     for show in shows_artist:
@@ -348,7 +349,7 @@ def show_artist(artist_id):
   # get a given artis 
   artist = Artist.query.filter_by(id=artist_id).first()
 
-  shows_artist = db.session.query(Venue.name, Venue.image_link, Show.venue_id, Show.artist_id, Show.start_time).join(Show, Show.venue_id == Venue.id).filter(Show.artist_id == artist_id)
+  shows_artist = db.session.query(Venue.name, Venue.image_link, Show.venue_id, Show.artist_id, Show.start_time).join(Show, Show.venue_id == Venue.id).filter(Show.artist_id == artist_id).all()
   upcoming_shows = []
   past_shows = []
 
@@ -549,7 +550,7 @@ def shows():
   for show in shows:
   # get venue and artist information for show  
     data.append({
-      "venue_id": show.venue_id,
+      "venue_id": show.venue_id,    
       "venue_name": Venue.query.get(show.venue_id).name,
       "artist_id": show.artist_id,
       "artist_name": Artist.query.get(show.artist_id).name,
