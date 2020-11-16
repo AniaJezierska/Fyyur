@@ -503,7 +503,7 @@ def shows():
       "start_time": format_datetime(str(show.start_time))
     })
 
-  return render_template('pages/shows.
+  return render_template('pages/shows.html', shows=data)
   # return shows page with show data
 
                          
