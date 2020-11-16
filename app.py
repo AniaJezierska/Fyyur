@@ -281,7 +281,8 @@ def search_artists():
     response['data'].append ({
       "id": artist.id,
       "name": artist.name,
-      "num_upcoming_shows": num_upcoming_shows   
+      "num_upcoming_shows": num_upcoming_shows
+    })     
   
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get("search_term"))
   # return reponse with matching search results
