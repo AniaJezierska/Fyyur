@@ -1,12 +1,14 @@
-from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
-app = Flask(__name__)
-app.config.from_object('config')
 db = SQLAlchemy()
-migrate = Migrate(app, db)
+
+def setup_db(app):
+    app.config.from_object('config')
+    db.app = app
+    db.init_app(app)
+    Migrate(app, db)  
+    return db
 
 #----------------------------------------------------------------------------#
 # Models.
@@ -53,9 +55,9 @@ class Show(db.Model):
     __tablename__ = "show"
   
     id = db.Column(db.Integer, primary_key=True)
-    start_time = db.Column(db.DateTime())
+    start_time = db.Column(db.DateTime(), nullable=True)
     artist_id = db.Column(db.Integer, db.ForeignKey('artists.id'), nullable=False)
     venue_id = db.Column(db.Integer, db.ForeignKey('venues.id'), nullable=False)
     pass
 
-db.create_all() 
+
