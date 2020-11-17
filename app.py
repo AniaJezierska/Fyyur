@@ -12,24 +12,27 @@ from flask import (
     Response, 
     flash, 
     redirect, 
-    url_for
+    url_for  
 )    
-from models import app, db, Venue, Artist, Show
 from flask_moment import Moment
 from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
 import logging
 from logging import Formatter, FileHandler
-from flask_wtf import Form
-from forms import *
+from flask_wtf import FlaskForm
+from forms import ShowForm, VenueForm, ArtistForm
+from flask_migrate import Migrate
+import copy
+from datetime import datetime
+from models import setup_db, Venue, Artist, Show
 
 #----------------------------------------------------------------------------#
 # App Config.
 #----------------------------------------------------------------------------#
 
-app.config.from_object(Config)
+app = Flask(__name__)
 moment = Moment(app)
-db.init_app(app)
+app.config.from_object('config')
+db = setup_db(app)
 
 #----------------------------------------------------------------------------#
 # Filters.
@@ -44,7 +47,7 @@ def format_datetime(value, format='medium'):
   return babel.dates.format_datetime(date, format, locale='en') 
 
 app.jinja_env.filters['datetime'] = format_datetime
-
+  
 #----------------------------------------------------------------------------#
 # Controllers.
 #----------------------------------------------------------------------------#
@@ -71,7 +74,7 @@ def venues():
     venues = Venue.query.filter_by(city=area.city, state=area.state).all()
     venue_data = []
     
-    data.append ({
+    data.append ({  
       "city" : area.city,
       "state": area.state,
       "venues": venue_data
@@ -83,13 +86,14 @@ def venues():
       shows_venue= Show.query.filter_by(venue_id=venue.id).all()
       for show in shows_venue:
         if show.start_time > datetime.now():
-          num_upcoming_shows = num_upcoming_shows + 1
+          num_upcoming_shows = num_upcoming_shows + 1   
 
       venue_data.append ({
         "id": venue.id,
         "name": venue.name,
-        "num_upcoming_shows": num_upcoming_shows
+        "num_upcoming_shows": num_upcoming_shows     
       }) 
+
   
   return render_template('pages/venues.html', areas=data);
   # return venues page with data
@@ -281,8 +285,8 @@ def search_artists():
     response['data'].append ({
       "id": artist.id,
       "name": artist.name,
-      "num_upcoming_shows": num_upcoming_shows
-    })     
+      "num_upcoming_shows": num_upcoming_shows 
+    })  
   
   return render_template('pages/search_artists.html', results=response, search_term=request.form.get("search_term"))
   # return reponse with matching search results
